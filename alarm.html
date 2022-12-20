@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        /* border: 1px solid red; */
+      }
+      .main {
+        min-height: 100vh;
+        width: 100vw;
+        background-color: lightgreen;
+        /* display: grid;
+        place-items: center; */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        /* gap: 30px; */
+      }
+      .container {
+        padding: 3rem;
+        text-align: center;
+        border-radius: 10px;
+        height: 23rem;
+        width: 19rem;
+        box-shadow: 0 0.3rem 1rem 0.1rem rgb(231, 230, 230);
+        font-size: 17px;
+      }
+      #set_hr_mi_sec {
+        color: rgb(104, 104, 104);
+        font-size: 19px;
+      }
+      #alarm_image {
+        height: 8rem;
+        width: 8rem;
+        border-radius: 50%;
+        padding: 4px;
+      }
+      .alarm_image_animation {
+        animation: rotateImage 4s linear infinite;
+      }
+      @keyframes rotateImage {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      .hh_min_am {
+        display: flex;
+        justify-content: space-between;
+      }
+      .hh_min_am input {
+        width: 5vw;
+        outline: none;
+        border: none;
+        padding: 0.4rem;
+        border-radius: 3px;
+      }
+      #alarmSet,
+      #snooz {
+        cursor: pointer;
+        margin-top: 4rem;
+        outline: none;
+        border: none;
+        padding: 0.4rem;
+        background: rgb(115, 114, 116);
+        border-radius: 3px;
+        color: #fff;
+      }
+      #snooz {
+        visibility: hidden;
+      }
+      /* #store_data_localStorage {
+        display: flex;
+        justify-content: space-evenly;
+        background-color: #fff;
+        width: 15rem;
+        font-size: 18px;
+        color: rgb(142, 141, 141);
+        border-radius: 3px;
+      } */
+      .task {
+        display: flex;
+        justify-content: space-evenly;
+        background-color: #fff;
+        width: 15rem;
+        font-size: 18px;
+        color: rgb(142, 141, 141);
+        border-radius: 3px;
+        margin: 10px;
+      }
+      .fa-solid {
+        background-color: blueviolet;
+        color: #fff;
+        padding: 5px;
+        border-radius: 3px;
+        font-size: 15px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="main">
+      <div class="container">
+        <span id="set_hr_mi_sec">00:00:00 PM</span>
+        <img src="headphone1.jpg" alt="" id="alarm_image" />
+        <div class="hh_min_am">
+          <input type="text" placeholder="hh" id="txt1" />
+          <input type="text" placeholder="min" id="txt2" />
+          <input type="text" placeholder="AM/PM" id="txt3" />
+        </div>
+        <button id="alarmSet">SetAlarm</button>
+        <!-- <button id="snooz">Snooz</button> -->
+      </div>
+      <!-- <div>
+        <div id="store_data_localStorage"></div>
+      </div> -->
+    </div>
+
+    <!-- // script alarm coding -->
+    <script>
+      var main = document.querySelector(".main");
+      var set_hr_mi_sec = document.getElementById("set_hr_mi_sec");
+      var txt1 = document.getElementById("txt1");
+      var txt2 = document.getElementById("txt2");
+      var txt3 = document.getElementById("txt3");
+      var alarmSet = document.getElementById("alarmSet");
+      var alarm_image = document.getElementById("alarm_image");
+      var alarmSeting;
+      var snoozSeting;
+      var snoozTxt1;
+      var snoozTxt2;
+      var snoozTxt3;
+      var alarmTone = new Audio("oversimplified-alarm-clock-113180.mp3");
+      // var snooz = document.getElementById("snooz");
+      var store_data_localStorage = document.getElementById(
+        "store_data_localStorage"
+      );
+
+      // var tasks = localStorage.getItem("tasks")
+      //   ? JSON.parse(localStorage.getItem("tasks"))
+      //   : [];
+
+      // Alarm Clock Functionalities..
+      const alarmClock = () => {
+        var hr = new Date().getHours();
+        var min = new Date().getMinutes();
+        var sec = new Date().getSeconds();
+        var ampm = hr >= 12 ? "PM" : "AM";
+        if (hr > 12) {
+          hr = hr - 12;
+        }
+        hr = hr < 10 ? "0" + hr : hr;
+        min = min < 10 ? "0" + min : min;
+        sec = sec < 10 ? "0" + sec : sec;
+
+        if (alarmSeting == `${hr}:${min} ${ampm}`) {
+          alarm_image.classList.add("alarm_image_animation");
+          alarmTone.play();
+        } else {
+          alarmTone.pause();
+        }
+
+        set_hr_mi_sec.innerText = `✌️${hr}:${min}:${sec} ${ampm}✌️`;
+      };
+      setInterval(alarmClock, 1000);
+
+      // setAlarm functionallyties
+      var playAlarm = true;
+      const setAlarm = () => {
+        if (txt1.value == "" || txt2.value == "" || txt3.value == "") {
+          alert("Plz fill this input boxes again set alarm");
+
+          txt1.focus();
+        } else {
+          var tasks = localStorage.getItem("tasks")
+            ? JSON.parse(localStorage.getItem("tasks"))
+            : [];
+
+          playAlarm = false;
+
+          var hours, mins, ampms;
+          removeTasks();
+
+          tasks.push({
+            hours: txt1.value,
+            mins: txt2.value,
+            ampms: txt3.value,
+          });
+
+          localStorage.setItem("tasks", JSON.stringify(tasks));
+
+          function addTasks() {
+            tasks.forEach((value, index) => {
+              const div = document.createElement("div");
+
+              const innerDiv = document.createElement("div");
+              innerDiv.setAttribute("class", "task");
+              div.appendChild(innerDiv);
+
+              var h3 = document.createElement("h3");
+              h3.innerText = value.hours;
+              innerDiv.appendChild(h3);
+
+              var h3 = document.createElement("h3");
+              h3.innerText = value.mins;
+              innerDiv.appendChild(h3);
+
+              var h3 = document.createElement("h3");
+              h3.innerText = value.ampms;
+              innerDiv.appendChild(h3);
+
+              const i = document.createElement("i");
+              i.setAttribute("class", "fa-solid fa-trash");
+              innerDiv.appendChild(i);
+
+              // Delete Data in LocalStorage Functionalyties..
+              i.addEventListener("click", () => {
+                removeTasks();
+                tasks.splice(index, 1);
+                localStorage.setItem("tasks", JSON.stringify(tasks));
+                addTasks();
+              });
+
+              main.append(div);
+            });
+          }
+
+          function removeTasks() {
+            tasks.forEach(() => {
+              const innerDiv = document.querySelector(".task");
+              innerDiv.remove();
+            });
+          }
+
+          addTasks();
+
+          // Set alarm in alarmtime and ring the bell..
+          alarmtime = `${txt1.value}:${txt2.value} ${txt3.value}`;
+          snoozTxt1 = txt1.value;
+          snoozTxt2 = txt2.value;
+          snoozTxt3 = txt3.value;
+          alarmSeting = alarmtime;
+          alarmSet.innerHTML = "clearAlarm";
+          txt1.value = txt2.value = txt3.value = "";
+        }
+      };
+
+      // clearAlarm functionallyties
+      const clearAlarm = () => {
+        playAlarm = true;
+        alarmtime = "";
+        alarmSeting = alarmtime;
+        alarmSet.innerHTML = "setAlarm";
+        alarm_image.classList.remove("alarm_image_animation");
+        // snooz.style.visibility = "visible";
+        snoozFunction();
+      };
+
+      alarmSet.addEventListener("click", () => {
+        playAlarm ? setAlarm() : clearAlarm();
+      });
+
+      // snooz functionnalities..
+      var count = 2;
+      const snoozFunction = () => {
+        if (count <= 7) {
+          alert(`Snooze the Alarm After ${count} Minutes from Current Time`);
+          playAlarm = false;
+          snoozPlus = Number(snoozTxt2) + count;
+          snoozPlus = snoozPlus < 10 ? "0" + snoozPlus : snoozPlus;
+          alarmSeting = `${snoozTxt1}:${snoozPlus} ${snoozTxt3}`;
+          // console.log(alarmSeting);
+          alarmSet.innerHTML = "clearAlarm";
+          count += 5;
+        }
+      };
+    </script>
+  </body>
+</html>
